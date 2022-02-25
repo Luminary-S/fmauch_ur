@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="ur5_imu_ft_robot">
+  <!-- filename: ur5_ft_imu.xacro
+this file contains the openzen alubi IMU, which is defined as a block; 
+a ft300 robotiq sensor, urdf from its own package used;
+a ur5  
+
+:param: name, still use ur5_robot, which can be compitable with the original only UR5 xacro file
+
+  -->
+
+  <!-- import macro for UR5  -->
+  <xacro:include filename="$(find ur_description)/urdf/inc/ur5_macro.xacro"/>
+  
+
+  <!--Import macro for robotiq_ft_sensor FT300 -->
+  <xacro:include filename="$(find robotiq_ft_sensor)/urdf/robotiq_ft300.urdf.xacro" />
+
+    <!--Import macro for imu_lpms_ig1 -->
+  <xacro:include filename="$(find openzen_sensor)/urdf/imu_lpms_ig1.xacro" />
+  
+<!-- inset ur5 -->
+  <xacro:ur5_robot prefix="" kinematics_parameters_file="/home/sgl/ur5_calib.yaml"/>
+
+
+  <!---->
+  <!-- <link name="world" />
+  <joint name="world_joint" type="fixed">
+    <parent link="world" />
+    <child link = "base" />
+    <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+  </joint> -->
+
+    <!-- IMU attached to ur5 tool0: imu_link -->
+
+    <joint name="imu_joint" type="fixed">
+      <!-- default toolframe: X+ left, Y+ up, Z+ front -->
+      <origin xyz="0.09402 0 -0.029" rpy="0  ${pi/2.0} 0"/>
+      <parent link="tool0"/>
+      <child link="imu_link"/>
+    </joint>   
+
+    <xacro:alubi prefix="imu"/> 
+
+<!-- print3D_link definition for collision ************ -->
+    <link name="print3D_link">
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+            <box size="0.11 0.07 0.007"/>
+        </geometry>
+    </collision>
+    <visual>  
+    <geometry>  
+        <box size="0.11 0.07 0.007"/>  
+    </geometry>  
+    <origin rpy="0 0 0" xyz="0 0 0"/>  
+            <material name="pring3D_springGreen">
+                <color rgba="0 1.0 0.49804 1.0"/>
+            </material>
+    </visual>  
+    <inertial>
+        <mass value="0.01" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <!-- Ixx = 1/12M(Ly^2+Lz^2) -->
+        <inertia ixx="1e-7" ixy="0" ixz="0" iyy="1e-7" iyz="0" izz="1e-7" />
+    </inertial>
+    </link>
+
+    <joint name="print3D_joint" type="fixed">
+      <!-- default toolframe: X+ left, Y+ up, Z+ front -->
+      <origin xyz="0.055 0 0.0035" rpy="0  0 0"/>
+      <parent link="tool0"/>
+      <child link="print3D_link"/>
+    </joint> 
+
+<!-- base ground definition for collision ************ -->
+      <link name="base_ground">
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+            <box size="1 1 0.002"/>
+        </geometry>
+    </collision>
+    <visual>  
+    <geometry>  
+        <box size="1 1 0.002"/>  
+    </geometry>  
+    <!-- set the imu origin on the top of the sensor -->
+    <origin rpy="0 0 0" xyz="0 0 0"/>  
+            <material name="pring3D_seagreen">
+            <!-- seagreen -->
+                <color rgba="0.18039 0.5451 0.34118 1.0"/>
+            </material>
+    </visual>  
+    <inertial>
+        <mass value="0.01" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <!-- Ixx = 1/12M(Ly^2+Lz^2) -->
+        <inertia ixx="1e-7" ixy="0" ixz="0" iyy="1e-7" iyz="0" izz="1e-7" />
+    </inertial>
+    </link>
+
+    <joint name="base_ground_joint" type="fixed">
+      <!-- default toolframe: X+ left, Y+ up, Z+ front -->
+      <origin xyz="0 0 -0.01" rpy="0  0 0"/>
+      <parent link="base"/>
+      <child link="base_ground"/>
+    </joint> 
+
+
+
+  <xacro:robotiq_ft300 parent="tool0" prefix="">
+		<origin xyz="0 0 0.0025" rpy="0 0 ${pi/2.0}"/>
+	</xacro:robotiq_ft300>
+
+</robot>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+
+  <!-- use common launch file and pass all arguments to it -->
+  <!-- <include file="$(find ur_description)/launch/load_ur.launch" pass_all_args="true"/> -->
+  <arg name="gui" default="true" />
+  <arg name="rvizconfig" default="$(find ur_description)/cfg/view_ur3_reverse.rviz" />
+
+  <arg name="model" default="$(find ur_description)/urdf/ur3_imu_ft.xacro"/>
+  <param name="robot_description" command="$(find xacro)/xacro.py $(arg model)" />
+  <param name="use_gui" value="$(arg gui)"/>
+
+  <!-- <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" /> -->
+  <node name="robot_state_publisher_sim" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+</launch>
