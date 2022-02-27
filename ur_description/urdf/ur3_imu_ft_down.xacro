@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="ur3_up_robot">
+
+<include filename="$(find robotiq_ft_sensor)/urdf/robotiq_ft300.urdf.xacro" />
+
+<include filename="$(find openzen_sensor)/urdf/imu_lpms_ig1.xacro" />
+
+	<!-- import macro for UR3 -->
+	<include filename="$(find ur_description)/urdf/inc/ur3_macro.xacro" />
+	<ur3_robot prefix="" kinematics_parameters_file="/home/sgl/catkin_new/src/URpacks/fmauch_universal_robot/ur_description/config/ur3/my_robot_calibration.yaml" />
+	<link name="world" />
+	<joint name="world_joint" type="fixed">
+		<parent link="world" />
+		<child link="base_link" />
+		<origin xyz="0.0 0.0 0.0" rpy="0.0 ${pi} 0.0" />
+	</joint>
+
+    <joint name="imu_joint" type="fixed">
+      <!-- default toolframe: X+ left, Y+ up, Z+ front -->
+      <origin xyz="0.09402 0 -0.029" rpy="0  ${pi/2.0} 0"/>
+      <parent link="tool0"/>
+      <child link="imu_link"/>
+    </joint>   
+
+    <xacro:alubi prefix="imu"/> 
+
+    <link name="print3D_link">
+    <collision>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+            <box size="0.11 0.07 0.007"/>
+        </geometry>
+    </collision>
+    <visual>  
+    <geometry>  
+        <box size="0.11 0.07 0.007"/>  
+    </geometry>  
+    <origin rpy="0 0 0" xyz="0 0 0"/>  
+            <material name="pring3D_springGreen">
+                <color rgba="0 1.0 0.49804 1.0"/>
+            </material>
+    </visual>  
+    <inertial>
+        <mass value="0.01" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <!-- Ixx = 1/12M(Ly^2+Lz^2) -->
+        <inertia ixx="1e-7" ixy="0" ixz="0" iyy="1e-7" iyz="0" izz="1e-7" />
+    </inertial>
+    </link>
+
+    <joint name="print3D_joint" type="fixed">
+      <!-- default toolframe: X+ left, Y+ up, Z+ front -->
+      <origin xyz="0.055 0 0.0035" rpy="0  0 0"/>
+      <parent link="tool0"/>
+      <child link="print3D_link"/>
+    </joint> 
+
+    <link name="base_ground">
+		<collision>
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<geometry>
+				<box size="1 1 0.002" />
+			</geometry>
+		</collision>
+		<visual>
+			<geometry>
+				<box size="0.1 0.1 0.002" />
+			</geometry>
+			<!-- set the imu origin on the top of the sensor -->
+			<origin rpy="0 0 0" xyz="0 0 0" />
+			<material name="pring3D_seagreen">
+				<!-- seagreen -->
+				<color rgba="0.18039 0.5451 0.34118 1.0" />
+			</material>
+		</visual>
+		<inertial>
+			<mass value="0.01" />
+			<origin xyz="0 0 0" rpy="0 0 0" />
+			<!-- Ixx = 1/12M(Ly^2+Lz^2) -->
+			<inertia ixx="1e-7" ixy="0" ixz="0" iyy="1e-7" iyz="0" izz="1e-7" />
+		</inertial>
+	</link>
+
+    <joint name="base_ground_joint" type="fixed">
+		<!-- default toolframe: X+ left, Y+ up, Z+ front -->
+		<origin xyz="0 0 -0.005" rpy="0  0 0" />
+		<parent link="base" />
+		<child link="base_ground" />
+	</joint>
+
+
+  <xacro:robotiq_ft300 parent="tool0" prefix="">
+		<origin xyz="0 0 0.0025" rpy="0 0 ${-pi/2.0}"/>
+	</xacro:robotiq_ft300>
+
+</robot>
